@@ -13,12 +13,6 @@
 
 Bootstrap and package your project with Angular 7 and Electron (Typescript + SASS + Hot Reload) for creating Desktop applications.
 
-Currently runs with:
-
-- Angular v7.0.3
-- Electron v3.0.2
-- Electron Builder v20.28.1
-
 With this sample, you can :
 
 - Run your app in a local development environment with Electron & Hot reload

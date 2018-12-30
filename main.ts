@@ -1,26 +1,40 @@
-import { app, BrowserWindow, screen } from 'electron';
+import { app, BrowserWindow, screen, ipcMain, IpcMessageEvent, dialog } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
+import { fromEvent } from 'rxjs';
+
+
+type Test<T> = [IpcMessageEvent, T];
+
+fromEvent<Test<[string, number, string]>>(ipcMain, 'show-open-dialog').subscribe(a => {
+  const channel = a[0];
+
+  dialog.showOpenDialog({}, (evt) => {
+    channel.sender.send('response', evt);
+  });
+});
+
 
 let win, serve;
 const args = process.argv.slice(1);
 serve = args.some(val => val === '--serve');
 
 function createWindow() {
-  const electronScreen = screen;
-  const size = electronScreen.getPrimaryDisplay().workAreaSize;
-
-  // Create the browser window.
   win = new BrowserWindow({
-    x: 0,
-    y: 0,
+    center: true,
     width: 1024,
-    height: 800
+    minWidth: 600,
+    height: 800,
+    minHeight: 600,
+    titleBarStyle: 'hidden',
+    webPreferences: {
+      webSecurity: false
+    }
   });
 
   if (serve) {
     require('electron-reload')(__dirname, {
-      electron: require(`${__dirname}/node_modules/electron`)
+      electron: require(`${__dirname}/node_modules/electron`),
     });
     win.loadURL('http://localhost:4200');
     win.webContents.openDevTools();
@@ -31,6 +45,7 @@ function createWindow() {
       slashes: true
     }));
   }
+
 
   // Emitted when the window is closed.
   win.on('closed', () => {
